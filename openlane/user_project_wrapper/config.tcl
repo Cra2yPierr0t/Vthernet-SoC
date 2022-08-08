@@ -55,7 +55,7 @@ set ::env(CLOCK_PERIOD) "10"
 ## Internal Macros
 ### Macro PDN Connections
 set ::env(FP_PDN_MACRO_HOOKS) "\
-    Vthernet_MAC vccd1 vssd1 vccd1 vssd1 \
+    Vthernet_MAC vccd1 vssd1 vccd1 vssd1, \
     rx_mem vccd1 vssd1 vccd1 vssd1"
 
 ### Macro Placement

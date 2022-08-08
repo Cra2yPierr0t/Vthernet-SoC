@@ -40,6 +40,8 @@ set ::env(DIE_AREA) "0 0 500 500"
 set ::env(PL_BASIC_PLACEMENT) 0
 set ::env(PL_TARGET_DENSITY) 0.20
 
+set ::env(ROUTING_CORES) 8
+
 # Maximum layer used for routing is metal 4.
 # This is because this macro will be inserted in a top level (user_project_wrapper) 
 # where the PDN is planned on metal 5. So, to avoid having shorts between routes

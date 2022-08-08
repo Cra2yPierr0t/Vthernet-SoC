@@ -5,7 +5,9 @@
 //
 
 `default_nettype none
-module Vthernet_MAC(
+module Vthernet_MAC #(
+    parameter MASK_WIDTH = 1
+)(
 `ifdef USE_POWER_PINS
     inout   vccd1,
     inout   vssd1,
@@ -48,7 +50,7 @@ module Vthernet_MAC(
     // write    : when web0 = 0, csb0 = 0
     // read     : when web0 = 1, csb0 = 0, maybe 3 clock delay...?
     // read     : when csb0 = 0, maybe 3 clock delay...?
-    output  wire        wmask0,
+    output  wire [MASK_WIDTH-1:0]  wmask0,
     output  wire        csb1,
     input   wire [7:0]  dout0,
     // Caravel interfce

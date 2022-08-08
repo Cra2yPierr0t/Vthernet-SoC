@@ -91,7 +91,7 @@ module user_project_wrapper #(
         .vccd1  (vccd1          ),
         .vssd1  (vssd1          ),
     `endif
-        .rst        (wb_rsi_i   ),
+        .rst        (wb_rst_i   ),
         // Wishbone interface
         .wb_clk_i   (wb_clk_i   ),
         .wb_rst_i   (wb_rst_i   ),
@@ -113,7 +113,7 @@ module user_project_wrapper #(
         .RXD        (io_in[20:13]),
         .RX_ER      (io_in[21]  ),
         .MDC        (io_in[22]  ),
-        .MDIO       (io_in[23]),
+        .MDIO       (io_in[23]  ),
         // PicoRV interface
         .rx_irq     (user_irq[0]),
         // Memory Interface
@@ -123,13 +123,14 @@ module user_project_wrapper #(
         .rx_addr    (rx_addr    ),
         .wmask0     (wmask0     ),
         .csb1       (csb1       ),
-        .io_oeb     (io_oeb     )
+        .io_oeb     (io_oeb[23:0]),
+        .dout0      (dout0      )
     );
 
     // write    : when web0 = 0, csb0 = 0
     // read     : when web0 = 1, csb0 = 0, maybe 3 clock delay...?
     // read     : when csb0 = 0, maybe 3 clock delay...?
-    sky130_sram_1kbyte_1rw1r_8x1024_8 rx_mem(
+    sky130_sram_1kbyte_1rw1r_8x1024_8 #(.NUM_WMASKS(2)) rx_mem(
     `ifdef USE_POWER_PINS
         .vccd1  (vccd1          ),
         .vssd1  (vssd1          ),
@@ -138,7 +139,7 @@ module user_project_wrapper #(
         .clk0   (RX_CLK         ), // clock
         .csb0   (rx_udp_data_vb ), // active low chip select
         .web0   (rx_udp_data_vb ), // active low write control
-        .wmask0 (wmask0         ), // write mask (1 bit)
+        .wmask0 ({wmask0, wmask0}), // write mask (1 bit)
         .addr0  (rx_addr        ), // addr (10 bit)
         .din0   (rx_udp_data    ), // data in (8 bit)
         .dout0  (dout0          ), // data out (8 bit)
