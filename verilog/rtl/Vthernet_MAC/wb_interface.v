@@ -34,8 +34,8 @@ module wb_interface #(
     output  reg         wbs_ack_o,
     output  reg  [31:0] wbs_dat_o,
     // CSRs
-    output  reg [OCT*6-1:0] mac_addr = 48'h01005e0000fb,
-    output  reg [OCT*4-1:0] ip_addr  = 32'he00000fb,
+    output  reg [OCT*6-1:0] mac_addr,
+    output  reg [OCT*4-1:0] ip_addr,
     output  reg [OCT*2-1:0] port,
     input   wire [OCT*6-1:0] src_mac,
     input   wire [OCT*4-1:0] src_ip,
