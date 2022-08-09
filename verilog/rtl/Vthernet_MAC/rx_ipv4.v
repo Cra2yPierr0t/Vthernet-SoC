@@ -145,11 +145,11 @@ module rx_ipv4 #(
                         endcase
                     end
                     default : begin
-                        rx_ipv4_data <= 1'b0;
+                        rx_ipv4_data_v <= 1'b0;
                     end
                 endcase
             end else begin
-                rx_ipv4_data <= 1'b0;
+                rx_ipv4_data_v <= 1'b0;
             end
         end
     end
