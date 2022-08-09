@@ -7,9 +7,11 @@ module rx_ethernet #(
 )(
     input   wire        rst,
 
-    input   wire [OCT*6-1:0] mac_addr,
     output  reg             rx_ethernet_irq, // if completed receive frame, take interrupt
-    output  reg [OCT*6-1:0] rx_mac_src,
+    // CSRs
+    input   wire [OCT*6-1:0] mac_addr,
+    output  reg [OCT*6-1:0] rx_src_mac,
+    output  reg [OCT*2-1:0] rx_len_type,
 
     // GMII Receive Interface
     input   wire            RX_CLK,
@@ -18,8 +20,8 @@ module rx_ethernet #(
     input   wire            RX_ER,
 
     // Interface for Next Layer Logic
-    output  reg             rx_payload_ipv4,
-    output  reg [OCT-1:0]   rx_payload
+    output  reg             rx_ethernet_data_v,
+    output  reg [OCT-1:0]   rx_ethernet_data
 );
 
     parameter RX_IDLE       = 3'b000;
@@ -33,21 +35,20 @@ module rx_ethernet #(
     reg [OCT*2-1:0]     data_cnt;
     reg [2:0]           rx_state;
     reg [OCT*6-1:0]     rx_mac_dst;
-    reg [OCT*2-1:0]     rx_len_type;
 
     reg [1:0] detect_posedge_rx_dv;
 
     always @(posedge RX_CLK) begin
         if(rst) begin
             rx_state    <= RX_IDLE;
-            rx_payload_ipv4 <= 1'b0;
+            rx_ethernet_data_v <= 1'b0;
             rx_ethernet_irq <= 1'b0;
             detect_posedge_rx_dv <= 2'b00;
         end else begin
             detect_posedge_rx_dv <= {detect_posedge_rx_dv[0], RX_DV};
             case(rx_state)
                 RX_IDLE : begin
-                    rx_payload_ipv4 <= 1'b0;
+                    rx_ethernet_data_v  <= 1'b0;
                     rx_ethernet_irq <= 1'b0;
                     if(detect_posedge_rx_dv == 2'b01) begin
                         rx_state    <= RX_WAIT_SFD;
@@ -84,7 +85,7 @@ module rx_ethernet #(
                         rx_state    <= RX_MAC_SRC;
                         data_cnt    <= data_cnt + 16'h0001;
                     end
-                    rx_mac_src  <= {rx_mac_src[OCT*5-1:0], RXD};
+                    rx_src_mac  <= {rx_src_mac[OCT*5-1:0], RXD};
                 end
                 RX_LEN_TYPE : begin
                     if(data_cnt == 8'h01) begin
@@ -100,21 +101,21 @@ module rx_ethernet #(
                     // READ FRAME HEADER
                     case(rx_len_type)
                         IPV4    : begin
-                            rx_payload      <= RXD;
+                            rx_ethernet_data    <= RXD;
                             if(RX_DV) begin
                                 rx_state        <= RX_READ_DATA;
-                                rx_payload_ipv4 <= 1'b1;
+                                rx_ethernet_data_v <= 1'b1;
                             end else begin
                                 rx_state        <= RX_IRQ;
-                                rx_payload_ipv4 <= 1'b0;
+                                rx_ethernet_data_v <= 1'b0;
                             end
                         end
                         default : begin
                             rx_state    <= RX_IDLE;
                             if(rx_len_type <= 16'h05DC) begin   // RAW FRAME
-                                rx_payload_ipv4 <= 1'b0;
+                                rx_ethernet_data_v <= 1'b0;
                             end else begin                      // UNKNOWN TYPE
-                                rx_payload_ipv4 <= 1'b0;
+                                rx_ethernet_data_v <= 1'b0;
                             end
                         end
                     endcase

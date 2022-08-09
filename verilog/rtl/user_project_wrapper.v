@@ -78,8 +78,8 @@ module user_project_wrapper #(
     output [2:0] user_irq
 );
 
-    wire            rx_udp_data_vb;
-    wire    [7:0]   rx_udp_data;
+    wire            rx_data_vb;
+    wire    [7:0]   rx_data;
     wire    [7:0]   rx_mem_out;
     wire    [9:0]   rx_addr;
     wire            wmask0;
@@ -117,8 +117,8 @@ module user_project_wrapper #(
         // PicoRV interface
         .rx_irq     (user_irq[0]),
         // Memory Interface
-        .rx_udp_data_vb (rx_udp_data_vb ),
-        .rx_udp_data    (rx_udp_data    ),
+        .rx_data_vb (rx_data_vb ),
+        .rx_data    (rx_data    ),
         .rx_mem_out (rx_mem_out ),
         .rx_addr    (rx_addr    ),
         .wmask0     (wmask0     ),
@@ -137,11 +137,11 @@ module user_project_wrapper #(
     `endif
         // RW
         .clk0   (RX_CLK         ), // clock
-        .csb0   (rx_udp_data_vb ), // active low chip select
-        .web0   (rx_udp_data_vb ), // active low write control
+        .csb0   (rx_data_vb     ), // active low chip select
+        .web0   (rx_data_vb     ), // active low write control
         .wmask0 ({wmask0, wmask0}), // write mask (1 bit)
         .addr0  (rx_addr        ), // addr (10 bit)
-        .din0   (rx_udp_data    ), // data in (8 bit)
+        .din0   (rx_data        ), // data in (8 bit)
         .dout0  (dout0          ), // data out (8 bit)
         // R
         .clk1   (wb_clk_i       ), // clock
